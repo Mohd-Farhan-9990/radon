@@ -39,47 +39,6 @@ const getRandomBooks = async function(req,res){
     let allbooks = await bookModel.find({$or: [{stockAvailable:true},{"totalPages":500}]})
     res.send({msg:allbooks})
 }
-const author = async function(req,res){
-    let data = req.body
-    let all = await authormodel.create(data)
-    res.send({msg:all})
-}
-const bookass = async function(req,res){
-    let data = req.body
-    let allbook = await bookModel.create(data)
-    res.send({msg:allbook})
-}
-
-const booksbyauthor = async function(req,res){
-    // let name = req.body
-    let data =  await authormodel.find({author_name:"Chetan Bhagat"}).select({"author_id":1})
-    console.log(data)
-    let alldata = await bookModel.find({author_id:data[0].author_id})
-    res.send({msg:alldata})
-}
-const authorName = async function(req,res){
-        let data = await bookModel.findOneAndUpdate(
-            {name:"Two States"},
-            {$set:{price:100}} ,
-            {new:true},       
-        ).select({"author_id":1 , "price":1})
-        let nprice = data.price
-        let findata = await authormodel.find({author_id:data.author_id}).select("author_name")
-        res.send({msg:findata,nprice})
-    }
-
-
-    const respondback = async function(req,res){
-        let data = await bookModel.find({price :{$gte:50, $lte:100}}).select({"author_id":1})
-        let findata = await authormodel.find({author_id:data[0].author_id}).select("author_name")
-        res.send({msg:findata})
-    }
-    
-module.exports.respondback = respondback    
-module.exports.authorName = authorName    
-module.exports.booksbyauthor = booksbyauthor
-module.exports.author = author
-module.exports.bookass = bookass
 module.exports.createBook = createBook
 module.exports.bookList = bookList
 module.exports.getBooksInYear = getBooksInYear
