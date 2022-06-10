@@ -1,4 +1,6 @@
 const UserModel= require("../models/userModel")
+const moment = require('moment');
+
 
 
 
@@ -14,21 +16,13 @@ const basicCode= async function(req, res) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+const midlassign = async function(req,res){
+    let date = Date.now()
+    let date1 = moment(date).format('YYYY-MM-DD, h:mm:ss')
+     const path = req.path
+    const IP = req.socket.localAddress
+    res.send({msg: "  Current TimeStamp is  "+date+"  Current Date is  "+date1+"   Path of route is "+path+"    IP addres is  "+IP})
+}
 
 const createUser= async function (req, res) {
     let data= req.body
@@ -41,6 +35,7 @@ const getUsersData= async function (req, res) {
     res.send({msg: allUsers})
 }
 
+module.exports.midlassign  = midlassign
 module.exports.createUser= createUser
 module.exports.getUsersData= getUsersData
 module.exports.basicCode= basicCode
