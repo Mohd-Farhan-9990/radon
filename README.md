@@ -46,3 +46,10 @@ Create API's to do each of the following:
                     "url": "https://i.imgflip.com/5mvxax.jpg",
                     "page_url": "https://imgflip.com/i/5mvxax"
                 }
+
+
+
+
+
+​/v2​/appointment​/sessions​/public​/calendarByDistrict
+https://cdn-api.co-vin.in/api​/v2​/appointment​/sessions​/public​/calendarByDistrict?district_id=${id}&date=${date}
