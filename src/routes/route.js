@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
+const blogController = require("../controllers/blogController.js")
+const authorController = require("../controllers/authorController")
 
 
 
-router.get("/tese-me",function(req,res){
-    res.send("Hlw")
-})
-
+router.post("/authors",authorController.createAuthor)
+router.post("/blogs",blogController.createBlog)
 module.exports = router
