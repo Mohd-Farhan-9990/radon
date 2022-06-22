@@ -38,7 +38,7 @@ const moment = require('moment');
                     let updatedData = await blogModel.findOneAndUpdate(         
                             {_id:id,isDeleted:false},                                                       //Condition in FindAnd Update           
                             {$set:{title:title,body:body,publishedAt:date1,isPublished:true},$push:{tags:tags,subCategory:subCategory}},         //Updation
-                            {$new:true}                                                                                                  //returning new updated value
+                            {new: true}                                                                                                  //returning new updated value
                     )
                 
                         if(updatedData){                                                            //Checking if data is upadated or not for isDeleted False
