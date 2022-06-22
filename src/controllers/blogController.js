@@ -9,7 +9,7 @@ const moment = require('moment');
        try{
             let data  = req.body
             if(Object.keys(data)==0){return   res.status(400).send({status:false,msg:""})}
-            let id = req.body.authorId                                                   //Getting the authorId from Body
+            let id = req.body.authorId                                                           //Getting the authorId from Body
             if(id){                                                                     //Checking If Id is there or not
                 if(isValidObjectId(id)){                                        //Checking If Id is valid or Not
                    let finaldata = await blogModel.create(data)
