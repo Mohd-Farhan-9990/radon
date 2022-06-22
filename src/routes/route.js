@@ -7,5 +7,8 @@ const authorController = require("../controllers/authorController")         //im
 
 router.post("/authors",authorController.createAuthor)           // Api for author's data Creation
 router.post("/blogs",blogController.createBlog)                 //Api for blogs data creation
+router.get("/blogs",blogController.getBlog)                     
 router.put("/blogs/:blogId",blogController.updateBlog)
+router.delete("/blogs/:blogId",blogController.deleteBlogsById)
+router.delete("/blogs",blogController.deleteBlogsByQuery)       
 module.exports = router
