@@ -29,22 +29,30 @@ const moment = require('moment');
 
     const updateBlog = async function(req,res){
         try{
-                let id = req.params.blogId
-                let tit = req.body.title
-                let bod =req.body.body
-                let tag = req.body.tags
-                let subCat =req.body.subCategory
-                let updatedData = await blogModel.findOneAndUpdate(
-                    {_id : id},
-                    {$set:{title:tit,body:bod},$push:{tags:tag,subCategory:subCat}},
-                    {$new:true}
-                )
-                res.send({data:updatedData})
+                let id = req.params.blogId                      //getting the id
+                let data2 = req.body                                            //Storing body data in data2 object
+                const{title,body,tags,subCategory} = data2                      //destructing the data2
+                let date = Date.now()                                           //getting timestamps value 
+                let date1 = moment(date).format('YYYY-MM-DD, h:mm:ss')          //formatting timestamps value in correct form
+                if(isValidObjectId(id)){                                        //Validating Id
+                    let updatedData = await blogModel.findOneAndUpdate(         
+                            {_id:id,isDeleted:false},                                                       //Condition in FindAnd Update           
+                            {$set:{title:title,body:body,publishedAt:date1,isPublished:true},$push:{tags:tags,subCategory:subCategory}},         //Updation
+                            {$new:true}                                                                                                  //returning new updated value
+                    )
+                
+                        if(updatedData){                                                            //Checking if data is upadated or not for isDeleted False
+                                    return res.status(201).send({data:updatedData})
+                        }else{
+                            return res.status(404).send({Status:false,msg:" "})
+                        }
+                }else{return res.status(400).send({Status:false,msg:" "})}
+                
 
         }
         catch(err)
         {
-            res.send(err.message)
+           return res.status(500).send(err.message)
         }
     }
 

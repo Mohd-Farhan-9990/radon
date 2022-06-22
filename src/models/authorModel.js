@@ -16,7 +16,8 @@ const authorSchema = new mongoose.Schema( {
    email:{
         type : String,
         required:true,
-       validate: [isEmail,'Inavlid Email Syntax']
+       validate: [isEmail,'Inavlid Email Syntax'],
+       unique: true
    },
 
    password:{
