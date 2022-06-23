@@ -10,7 +10,7 @@ const createAuthor = async function(req,res){
             return res.status(400).send({Status:false, msg:"Empty Body"})
         }
         const{name,title,email,password} = data1
-        if(!isNaN(name) && !name){
+        if(!isNaN(name) || !name){
             return res.status(400).send({Status:false, msg:"Name Should Not be empty or Name should not be a Number"})
         }
         else if(!title){

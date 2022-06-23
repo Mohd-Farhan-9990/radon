@@ -34,7 +34,7 @@ const moment = require('moment');
                     }else if(!subCategory){
                         return res.status(400).send({Status:false,msg:"subCategory Should Not Be Empty"})
                     }else{
-                   let finaldata = await blogModel.create(data)
+                   let finaldata = await blogModel.create(res1)
                     return res.status(201).send({data:finaldata})
                     }
                 
@@ -46,80 +46,28 @@ const moment = require('moment');
        }
     }
 
+//====================================================GET BLOGS ======================================================
+ 
+const getBlog =  async function(req,res){
 
-//GetBlog
-    const getBlog = async function (req, res) {
-        try {
-          let filterBlog = { isDeleted: false, deletedAt: null, isPublished: true };
-          let queryParams = req.query;
-          const { authorId, category, tags, subcategory } = queryParams;
-      
-          if (!isValidString(authorId)) {
-            return res
-              .status(400)
-              .send({ status: false, message: "Author id is required" });
-          }
-          if (authorId) {
-            if (isValidObjectId(authorId)) {
-              return res.status(400).send({
-                status: false,
-                message: `authorId is not valid.`,
-              });
+    try{
+            let quer = req.query                                                            //getting the data from querry
+            const{authorId,category,tags,subCategory} = quer                                //destructing data
+            let getD = await blogModel.find({isDeleted:false,isPublished:true}||{_id:authorId}||{category:category}||{tags:[tags]}||{subCategory:[subCategory]})      // finding data with some cndtions
+            if(getD.length>0){
+                return res.status(200).send({Status:true,data:getD})
             }
-          }
-      
-          if (!isValidString(category)) {
-            return res.status(400).send({
-              status: false,
-              message: "Category cannot be empty while fetching.",
-            });
-          }
-      
-          if (!isValidString(tags)) {
-            return res.status(400).send({
-              status: false,
-              message: "tags cannot be empty",
-            });
-          }
-          // console.log(tags)
-          // console.log(subcategory)
-      
-          if (!isValidString(subcategory)) {
-            return res.status(400).send({
-              status: false,
-              message: "subcategory cannot be empty ",
-            });
-          }
-      
-          if (isValidRequestBody(queryParams)) {
-            const { authorId, category, tags, subcategory } = queryParams;
-            if (isValid(authorId) && isValidObjectId(authorId)) {
-              filterBlog["authorId"] = authorId;
+            else{
+               return res.status(400).send({Status:false,msg:"No Data Availabe with these Parameters"})
             }
-            if (isValid(category)) {
-              filterBlog["category"] = category.trim();
-            }
-            if (isValid(tags)) {
-              const tagsArr = tags.trim().split(",").map((x) => x.trim());
-              filterBlog["tags"] = { $all: tagsArr };
-            }
-            if (isValid(subcategory)) {
-              const subcatArr = subcategory .trim().split(",").map((subcat) => subcat.trim());
-              filterBlog["subcategory"] = { $all: subcatArr };
-            }
-          }
-          const blog = await blogModel.find(filterQuery);
-          console.log(blog)
-      
-          if (Array.isArray(blog) && blog.length === 0) {
-            return res.status(404).send({ status: false, message: "No blogs found" });
-          }
-          res.status(200).send({ status: true, message: "Blog list", data: blog });
-        } catch (error) {
-          res.status(500).send({ status: false, Error: error.message });
         }
-      }
+        catch(err){
+          return res.status(500).send({Status:false,msg:err.message})
+        }    
 
+
+
+}
 
 //====================================================Updating Blogs==================================================
 
@@ -155,7 +103,7 @@ const moment = require('moment');
 
 
 
-    //DELETE BY BLOG-ID AS PARAMS
+    //==========================================DELETE BY BLOG-ID AS PARAMS===========================================
 
 const deleteBlogsById = async function (req, res) {
     try {
@@ -178,14 +126,14 @@ const deleteBlogsById = async function (req, res) {
             
        
     } catch (error) {
-        res.status(500).send({status: false,msg:" "});
+              res.status(500).send({status: false,msg:" "});
     }
 
 };
 
 
 
-//DELETE BY QUERY
+//===============================================DELETE BY QUERY=======================================================
 
 
 const deleteBlogsByQuery = async function (req, res) {
