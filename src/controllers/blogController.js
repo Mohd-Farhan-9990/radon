@@ -88,7 +88,7 @@ const getBlog =  async function(req,res){
                         if(updatedData){                                                            //Checking if data is upadated or not for isDeleted False
                                     return res.status(201).send({data:updatedData})
                         }else{
-                            return res.status(404).send({Status:false,msg:" "})
+                            return res.status(400).send({Status:false,msg:" "})
                         }
                 }else{return res.status(400).send({Status:false,msg:" "})}
                 
@@ -138,70 +138,19 @@ const deleteBlogsById = async function (req, res) {
 
 const deleteBlogsByQuery = async function (req, res) {
     try {
-        let data = req.query;
-        if (data.authorId) {
-            if (!isValidObjectId(data.authorId)) return res.status(401).send({
-                status: false,
-                msg: "Invalid Author Id"
-            });
-        }
-        // add a query variable
-        let query = {};
-
-        if (Object.keys(data).length == 0) {
-            //-> if data undefined
-            return res.status(400).send({
-                status: false,
-                msg: "no query params available "
-            });
-        } else if (data.tags) {
-                data.tags = {
-                    $in: data.tags
-                };
-            }
-
-            //-> if subcategory defined
-            if (data.subCategory) {
-                data.subCategory = {
-                    $in: data.subCategory
-                };
-            }
-
-            // create a query structure
-        
-
-        // add default query
-        query.isDeleted = false
-
-        // check if the query related data exist OR not
-        const available = await blogModel.find(query).count();
-        if (available == 0) {
-            return res.status(404).send({
-                status: false,
-                msg: "query data not found OR may be you are Unauthorised to delete info"
-            });
-        }
-
-        // perform delete here using update many 
-        const deleteData = await blogModel.updateMany(query, {
-            $set: {
-                isDeleted: true,
-                deletedAt: Date()
-            }
-        });
-        res.status(200).send({
-            status: true,
-            data: deleteData
-        });
-
-    } catch (error) {
-        res.status(500).send({
-            status: false,
-            msg: error.message
-        });
+          let quer = req.query
+          const{category,authorId,tags,subCategory}= quer
+          let result = await blogModel.findOneAndUpdate({
+            $or:[{category:category} || {authorId:authorId} || {tags:[tags]}|| {subCategory:[subCategory]}]},
+            {$set:{isDeleted:true}},
+            {new:true}
+          )
+          return res.status(200).send({Status:true,data:result})
+       }
+        catch (error) {
+        res.status(500).send({status: false, msg: error.message});
     }
 };
-
 
 
 
