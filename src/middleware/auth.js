@@ -40,7 +40,7 @@ const authorisation = async function(req,res,next){
         let authorLoggedIn = decodedToken.authorid
         console.log(id)
                  if(id !== authorLoggedIn) {
-                        return res.send({status: false, msg: 'Author logged is not allowed to modify the blog'})
+                        return res.status(403).send({status: false, msg: 'Author logged is not allowed to modify the blog'})
                     }
     
     
@@ -48,7 +48,7 @@ const authorisation = async function(req,res,next){
     }
     
     catch(err){
-
+            res.status(500).send({status:false,msg:err.message})
     }
 }
 

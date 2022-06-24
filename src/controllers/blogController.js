@@ -34,7 +34,7 @@ const moment = require('moment');
                     }else if(!subCategory){
                         return res.status(400).send({Status:false,msg:"subCategory Should Not Be Empty"})
                     }else{
-                   let finaldata = await blogModel.create(res1)
+                            let finaldata = await blogModel.create(res1)                    //Creating Blog
                     return res.status(201).send({data:finaldata})
                     }
                 
@@ -53,11 +53,9 @@ const getBlog =  async function(req,res){
     try{
             let quer = req.query                                                            //getting the data from querry
             const{authorId,category,tags,subCategory} = quer                               //destructing data
-            console.log(category)
            
                     // let getD =  await blogModel.find({$and:[{isDeleted:falseisPublished:true},{$or:[{category:category}||{tags:tags}]}]}).populate('authorId')     // finding data with some cndtions
-                    let getD = await blogModel.find({$and:[{isDeleted:false,isPublished:false},{$or:[{_id:authorId},{category:category},{tags:{$in:[tags]}},{subCategory:{$in:[subCategory]}}]}]}).populate('authorId')
-                    console.log(category)
+                    let getD = await blogModel.find({$and:[{isDeleted:false,isPublished:true},{$or:[{_id:authorId},{category:category},{tags:{$in:[tags]}},{subCategory:{$in:[subCategory]}}]}]}).populate('authorId')
                     if(getD.length>0){
                         return res.status(200).send({Status:true,data:getD})
                     }
@@ -83,17 +81,18 @@ const getBlog =  async function(req,res){
                 const{title,body,tags,subCategory} = data2                      //destructing the data2
                 let date = Date.now()                                           //getting timestamps value 
                 let date1 = moment(date).format('YYYY-MM-DD, h:mm:ss')          //formatting timestamps value in correct form
-                if(isValidObjectId(id)){                                        //Validating Id
+                if(isValidObjectId(id)){                  
+                    console.log("Hlw")                      //Validating Id
                     let updatedData = await blogModel.findOneAndUpdate(         
                             {_id:id,isDeleted:false},                                                       //Condition in FindAnd Update           
                             {$set:{title:title,body:body,publishedAt:date1,isPublished:true},$push:{tags:tags,subCategory:subCategory}},         //Updation
                             {new: true}                                                                                                  //returning new updated value
-                    )
+                    ).populate('authorId')
                 
-                        if(updatedData){                                                            //Checking if data is upadated or not for isDeleted False
+                        if(Object.keys(updatedData).length>0){                                                            //Checking if data is upadated or not for isDeleted False
                                     return res.status(201).send({data:updatedData})
                         }else{
-                            return res.status(400).send({Status:false,msg:" "})
+                            return res.status(400).send({Status:false,msg:"No Updation Done"})
                         }
                 }else{return res.status(400).send({Status:false,msg:" "})}
                 
@@ -113,10 +112,7 @@ const getBlog =  async function(req,res){
 const deleteBlogsById = async function (req, res) {
     try {
             let blogId = req.params.blogId;
-            let result = await blogModel.findOne({
-                _id: blogId,
-                isDeleted: false
-            });
+            let result = await blogModel.findOne({_id: blogId,isDeleted: false});
 
             if (!result) return res.status(404).send({status: false,msg: "User data not found" })
             else{
@@ -125,7 +121,6 @@ const deleteBlogsById = async function (req, res) {
                 {isDeleted: true,deletedAt: Date()},
                 {new: true});
         
-            
                 return res.status(200).send({Status: true,data:updated });
             }
             
@@ -163,6 +158,6 @@ const deleteBlogsByQuery = async function (req, res) {
 
 
 
-    module.exports={createBlog,updateBlog,getBlog,deleteBlogsById,deleteBlogsByQuery}
+ module.exports={createBlog,updateBlog,getBlog,deleteBlogsById,deleteBlogsByQuery}
    
 
