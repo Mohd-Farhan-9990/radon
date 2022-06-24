@@ -11,9 +11,7 @@ const authenticate = async function(req, res, next) {
         if (!token) token = req.headers["x-api-key"];
     
         //If no token is present in the request header return error
-        if (!token){ 
-                return res.send({ status: false, msg: "token must be present" });
-        }
+       
         if(!token){
                 return res.send({status: false, msg: "token must be present in the request header"})
             }
@@ -55,5 +53,4 @@ const authorisation = async function(req,res,next){
 }
 
 
-module.exports.authenticate=authenticate
-module.exports.authorisation=authorisation
+module.exports={authenticate,authorisation}

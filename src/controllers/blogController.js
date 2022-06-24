@@ -52,14 +52,19 @@ const getBlog =  async function(req,res){
 
     try{
             let quer = req.query                                                            //getting the data from querry
-            const{authorId,category,tags,subCategory} = quer                                //destructing data
-            let getD = await blogModel.find({isDeleted:false,isPublished:true}||{_id:authorId}||{category:category}||{tags:[tags]}||{subCategory:[subCategory]})      // finding data with some cndtions
-            if(getD.length>0){
-                return res.status(200).send({Status:true,data:getD})
-            }
-            else{
-               return res.status(400).send({Status:false,msg:"No Data Availabe with these Parameters"})
-            }
+            const{authorId,category,tags,subCategory} = quer                               //destructing data
+            console.log(category)
+           
+                    // let getD =  await blogModel.find({$and:[{isDeleted:falseisPublished:true},{$or:[{category:category}||{tags:tags}]}]}).populate('authorId')     // finding data with some cndtions
+                    let getD = await blogModel.find({$and:[{isDeleted:false,isPublished:false},{$or:[{_id:authorId},{category:category},{tags:{$in:[tags]}},{subCategory:{$in:[subCategory]}}]}]}).populate('authorId')
+                    console.log(category)
+                    if(getD.length>0){
+                        return res.status(200).send({Status:true,data:getD})
+                    }
+                    else{
+                    return res.status(400).send({Status:false,msg:"No Data Availabe with these Parameters"})
+                    }
+            
         }
         catch(err){
           return res.status(500).send({Status:false,msg:err.message})
@@ -158,10 +163,6 @@ const deleteBlogsByQuery = async function (req, res) {
 
 
 
-    module.exports.createBlog =createBlog
-    module.exports.updateBlog=updateBlog
-    module.exports.getBlog = getBlog
-    module.exports.deleteBlogsById =deleteBlogsById
-    module.exports.deleteBlogsByQuery=deleteBlogsByQuery
-
+    module.exports={createBlog,updateBlog,getBlog,deleteBlogsById,deleteBlogsByQuery}
+   
 

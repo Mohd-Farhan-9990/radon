@@ -7,10 +7,10 @@ const mid = require("../middleware/auth")
 
 
 router.post("/authors",authorController.createAuthor)           // Api for author's data Creation
-router.post("/blogs",blogController.createBlog)                 //Api for blogs data creation
-router.get("/blogs",blogController.getBlog)                     
+router.post("/blogs",mid.authenticate,blogController.createBlog)                 //Api for blogs data creation
+router.get("/blogs",mid.authenticate,blogController.getBlog)                     
 router.put("/blogs/:blogId",mid.authenticate,mid.authorisation,blogController.updateBlog)
-router.delete("/blogs/:blogId",blogController.deleteBlogsById)
-router.delete("/blogs",blogController.deleteBlogsByQuery)       
+router.delete("/blogs/:blogId",mid.authenticate,mid.authorisation,blogController.deleteBlogsById)
+router.delete("/blogs",mid.authenticate,mid.authorisation,blogController.deleteBlogsByQuery)       
 router.post("/login",authorController.loginAuthor)       
 module.exports = router
