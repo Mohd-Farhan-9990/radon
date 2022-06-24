@@ -24,7 +24,7 @@ const authenticate = async function(req, res, next) {
         return  next()
     }
     catch(err){
-        res.status(500).send({Status:false,msg:err.message})
+        res.status(500).send({status:false,msg:err.message})
     }
 }
 

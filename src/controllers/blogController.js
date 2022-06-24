@@ -22,17 +22,17 @@ const moment = require('moment');
                     return res.status(400).send({status:false,msg:"Author Doesn't Exist with this Id"})
                 }
                    else if(!title){
-                        return res.status(400).send({Status:false,msg:"Title Should Not Be empty"})
+                        return res.status(400).send({status:false,msg:"Title Should Not Be empty"})
                     }
                     else if(!body){
-                        return res.status(400).send({Status:false,msg:"Body Should Not Be Empty"})
+                        return res.status(400).send({status:false,msg:"Body Should Not Be Empty"})
                     }
                     else if(!tags){
-                        return res.status(400).send({Status:false,msg:"Tags Should Not Be Empty"})
+                        return res.status(400).send({status:false,msg:"Tags Should Not Be Empty"})
                     }else if(!category){
-                        return res.status(400).send({Status:false,msg:"Bcategory Should Not Be Empty"})
+                        return res.status(400).send({status:false,msg:"Bcategory Should Not Be Empty"})
                     }else if(!subCategory){
-                        return res.status(400).send({Status:false,msg:"subCategory Should Not Be Empty"})
+                        return res.status(400).send({status:false,msg:"subCategory Should Not Be Empty"})
                     }else{
                             let finaldata = await blogModel.create(res1)                    //Creating Blog
                     return res.status(201).send({data:finaldata})
@@ -54,18 +54,17 @@ const getBlog =  async function(req,res){
             let quer = req.query                                                            //getting the data from querry
             const{authorId,category,tags,subCategory} = quer                               //destructing data
            
-                    // let getD =  await blogModel.find({$and:[{isDeleted:falseisPublished:true},{$or:[{category:category}||{tags:tags}]}]}).populate('authorId')     // finding data with some cndtions
-                    let getD = await blogModel.find({$and:[{isDeleted:false,isPublished:true},{$or:[{_id:authorId},{category:category},{tags:{$in:[tags]}},{subCategory:{$in:[subCategory]}}]}]}).populate('authorId')
-                    if(getD.length>0){
-                        return res.status(200).send({Status:true,data:getD})
-                    }
-                    else{
-                    return res.status(400).send({Status:false,msg:"No Data Availabe with these Parameters"})
-                    }
+            let getD = await blogModel.find({$and:[{isDeleted:false,isPublished:true},{_id:authorId},{category:category},{tags:{$in:[tags]}},{subCategory:{$in:[subCategory]}}]}).populate('authorId')
+                if(getD.length>0){
+                        return res.status(200).send({status:true,data:getD})
+                }
+                else{
+                        return res.status(400).send({status:false,msg:"No Data Availabe with these Parameters"})
+                }
             
         }
         catch(err){
-          return res.status(500).send({Status:false,msg:err.message})
+            return res.status(500).send({status:false,msg:err.message})
         }    
 
 
@@ -81,8 +80,8 @@ const getBlog =  async function(req,res){
                 const{title,body,tags,subCategory} = data2                      //destructing the data2
                 let date = Date.now()                                           //getting timestamps value 
                 let date1 = moment(date).format('YYYY-MM-DD, h:mm:ss')          //formatting timestamps value in correct form
-                if(isValidObjectId(id)){                  
-                    console.log("Hlw")                      //Validating Id
+                if(isValidObjectId(id)){                                         //Validating Id
+                                        
                     let updatedData = await blogModel.findOneAndUpdate(         
                             {_id:id,isDeleted:false},                                                       //Condition in FindAnd Update           
                             {$set:{title:title,body:body,publishedAt:date1,isPublished:true},$push:{tags:tags,subCategory:subCategory}},         //Updation
@@ -92,9 +91,9 @@ const getBlog =  async function(req,res){
                         if(Object.keys(updatedData).length>0){                                                            //Checking if data is upadated or not for isDeleted False
                                     return res.status(201).send({data:updatedData})
                         }else{
-                            return res.status(400).send({Status:false,msg:"No Updation Done"})
+                            return res.status(400).send({status:false,msg:"No Updation Done"})
                         }
-                }else{return res.status(400).send({Status:false,msg:" "})}
+                }else{return res.status(400).send({status:false,msg:"Invalid Id "})}
                 
 
         }
@@ -113,15 +112,14 @@ const deleteBlogsById = async function (req, res) {
     try {
             let blogId = req.params.blogId;
             let result = await blogModel.findOne({_id: blogId,isDeleted: false});
-
             if (!result) return res.status(404).send({status: false,msg: "User data not found" })
             else{
                 let updated = await blogModel.findByIdAndUpdate(
                 {  _id: blogId,isDeleted: false},
                 {isDeleted: true,deletedAt: Date()},
-                {new: true});
+                {new: true}).populate('authorId')
         
-                return res.status(200).send({Status: true,data:updated });
+                return res.status(200).send({status: true,data:updated });
             }
             
        
@@ -143,9 +141,9 @@ const deleteBlogsByQuery = async function (req, res) {
           let result = await blogModel.findOneAndUpdate({
             $or:[{category:category} || {authorId:authorId} || {tags:[tags]}|| {subCategory:[subCategory]}]},
             {$set:{isDeleted:true}},
-            {new:true}
-          )
-          return res.status(200).send({Status:true,data:result})
+            {new:true}).populate('authorId')
+          
+          return res.status(200).send({status:true,data:result})
        }
         catch (error) {
         res.status(500).send({status: false, msg: error.message});
