@@ -6,22 +6,32 @@ const jwt = require('jsonwebtoken')
 
 const createAuthor = async function(req,res){
     try{
-        let data1 = req.body
-        if(Object.keys(data1).length==0){
+        let data1 = req.body                                //Extracting Body
+        if(Object.keys(data1).length == 0){                                       //Validating Request Body If Data is Present
             return res.status(400).send({status:false, msg:"Empty Body"})
         }
-        const{name,title,email,password} = data1
-        let unique = await authorModel.find({email:email})
-        if(!isNaN(name) || !name){
-            return res.status(400).send({status:false, msg:"Name Should Not be empty or Name should not be a Number"})
+        const{fname,lname,title,email,password} = data1                             //Destructing data1 object
+        let unique = await authorModel.findOne({email})   
+        const titleValid = function(title){
+            return ['Mr','Mrs','Miss'].indexOf(title) !== -1
+        }    
+         
+        //Validation Start Form Here
+        if(!fname || !isNaN(fname)){
+            return res.status(400).send({status:false, msg:"Fname Should Not be empty and should not be a Number"})
+        }
+        else if(!lname || !isNaN(lname) ){
+            return res.status(400).send({status:false, msg:"lname Should Not be empty and should not be a Number"})
         }
         else if(!title){
             return res.status(400).send({status:false, msg:"title Should Not be Empty"})
-
+        }
+        else if(!titleValid(title)){
+            return res.status(400).send({status :false, msg:"Title should be:- 'Mr','Mrs','Miss'"})
         }
         else if(!/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)){
             return res.status(400).send({status:false, msg:"Invalid Email Syntax"})
-        }else if(unique.length>0){
+        }else if(unique){
             return res.status(400).send({status:false,msg:"Email Id is already registered"})
 
         }
@@ -29,6 +39,7 @@ const createAuthor = async function(req,res){
             return res.status(400).send({status:false, msg:"Password Should Not be Empty"})
 
         }
+        //Creting Author Data 
        else{ 
         let finaldata = await authorModel.create(data1)
         return res.status(201).send({status:true,data:finaldata})}
@@ -52,17 +63,19 @@ const loginAuthor = async (req,res)=>{
               return res.status(400).send({status:false,msg:"Enter a valid Email"})
             }
             let authorDetail=await authorModel.findOne({email,password})
-            if(!authorDetail){
-             return res.status(400).send({status:false,msg:"email or password is invalid"})
-            }
+            if(authorDetail){
+            
             let token=jwt.sign(                                             //generating Token
                 {
                 authorid:authorDetail._id.toString()
                 },"Group 17/blog-project-1"
             )
-            console.log(token)
             res.setHeader("x-api-key",token)  
-            return res.status(200).send({status:true,Token:token})
+            return res.status(200).send({status:true,msg:"Author Logged in Succesfully",data:token})
+            }
+            else{
+                return res.status(400).send({status:false,msg:"email or password is invalid"})
+            }
     }
   
     catch(err){

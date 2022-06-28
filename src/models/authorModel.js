@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
-const {isEmail} = require('validator') 
 
 const authorSchema = new mongoose.Schema( {
-    name:{ 
+    fname:{ 
         type: String,
         required :true 
+    },
+    lname:{
+            type:String,
+            required:true
     },
 
    title:{
@@ -21,7 +24,8 @@ const authorSchema = new mongoose.Schema( {
 
    password:{
     type:String,
-    required: true
+    required: true,
+    unique:true
    }
 }, { timestamps: true });
 
